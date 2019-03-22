@@ -4,7 +4,12 @@ import socketserver
 import json
 from http.server import BaseHTTPRequestHandler
 from urllib.parse import urlparse, parse_qs
+import os
 
+if os.getenv('NAMEGEN_PORT', '8080').isdigit():
+    PORT = int(os.getenv('NAMEGEN_PORT', '8080'))
+else:
+    PORT = 8080
 
 class NameServer(BaseHTTPRequestHandler):
     first_names = [
@@ -50,9 +55,6 @@ class NameServer(BaseHTTPRequestHandler):
         self.send_header('Content-Type', 'application/json')
         self.end_headers()
         self.wfile.write(bytes(json.dumps(response_obj), 'utf-8'))
-
-
-PORT = 8080
 
 with socketserver.TCPServer(("", PORT), NameServer) as httpd:
     print("[INFO] Serving at port", PORT)
